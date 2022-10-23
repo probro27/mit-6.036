@@ -15,3 +15,6 @@ The answer should be a 2D array (a 1 by 1). Look at the \href{https://docs.scipy
 """
 def positive(x, th, th0):
     return np.sign(signed_dist(x, th, th0))
+
+def sol_positive(x, th, th0):
+    return np.sign(np.dot(th.T, x) + th0)

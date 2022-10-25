@@ -17,6 +17,6 @@ def score_mat(data, labels, ths, th0s):
    pos = np.sign(np.dot(np.transpose(ths), data) + np.transpose(th0s))
    return np.sum(pos == labels, axis = 1, keepdims = True)
 
-def best_separator(data, labels, ths, th0s):
+def sol_best_separator(data, labels, ths, th0s):
    best_index = np.argmax(score_mat(data, labels, ths, th0s))
    return cv(ths[:,best_index]), th0s[:,best_index:best_index+1] # cv is column vector

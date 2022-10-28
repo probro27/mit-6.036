@@ -540,14 +540,20 @@ def eval_classifier(learner, data_train, labels_train, data_test, labels_test):
     return scored / data_test.shape[1]
 
 #Test cases:
-test_eval_classifier(eval_classifier,perceptron)
+# test_eval_classifier(eval_classifier,perceptron)
 
 
 def eval_learning_alg(learner, data_gen, n_train, n_test, it):
-    pass
+    avg_acc = 0
+    for iteration in range(it):
+        (data_train, labels_train) = data_gen(n_train)
+        (data_test, labels_test) = data_gen(n_test)
+        acc = eval_classifier(learner, data_train, labels_train, data_test, labels_test)
+        avg_acc += acc
+    return avg_acc / it
 
 #Test cases:
-#test_eval_learning_alg(eval_learning_alg,perceptron)
+test_eval_learning_alg(eval_learning_alg,perceptron)
 
 
 def xval_learning_alg(learner, data, labels, k):

@@ -535,10 +535,12 @@ for datafn in (super_simple_separable, xor, xor_more, big_higher_dim_separable):
 #test_averaged_perceptron(averaged_perceptron)
 
 def eval_classifier(learner, data_train, labels_train, data_test, labels_test):
-    pass
+    (theta, theta_0) = learner(data_train, labels_train)
+    scored = score(data_test, labels_test, theta, theta_0)
+    return scored / data_test.shape[1]
 
 #Test cases:
-#test_eval_classifier(eval_classifier,perceptron)
+test_eval_classifier(eval_classifier,perceptron)
 
 
 def eval_learning_alg(learner, data_gen, n_train, n_test, it):
@@ -557,9 +559,3 @@ def xval_learning_alg(learner, data, labels, k):
 
 #For problem 10, here is an example of how to use gen_flipped_lin_separable, in this case with a flip probability of 50%
 #print(eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=.5), 20, 20, 5))
-
-def main():
-    test_averaged_perceptron(averaged_perceptron)
-
-if __name__=='__main__':
-    main()

@@ -510,7 +510,19 @@ def averaged_perceptron(data, labels, params={}, hook=None):
     # if T not in params, default to 100
     T = params.get('T', 100)
     # Your implementation here
-    pass
+    theta = np.zeros((data.shape[0],1))
+    theta_0 = 0
+    thetas = theta
+    theta_0s = theta_0
+    for _ in range(T):
+        for j in range(data.shape[1]):
+            if labels[:,j] * (np.dot(theta.T, data[:,j])[0] + theta_0) <= 0:
+                theta = theta + np.array([labels[:,j] * data[:,j]]).T 
+                theta_0 = theta_0 + labels[:,j]
+            thetas = thetas + theta
+            theta_0s = theta_0s + theta_0
+    theta_0s = [theta_0s for _ in range(1)]
+    return (thetas/(data.shape[1] * T), np.array(np.array(theta_0s)/(data.shape[1] * T), dtype=np.float64))
 
 # Visualization of Averaged Perceptron:
 '''
@@ -547,7 +559,7 @@ def xval_learning_alg(learner, data, labels, k):
 #print(eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=.5), 20, 20, 5))
 
 def main():
-    test_perceptron(perceptron)
+    test_averaged_perceptron(averaged_perceptron)
 
 if __name__=='__main__':
     main()

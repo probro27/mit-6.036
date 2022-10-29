@@ -548,6 +548,8 @@ def eval_learning_alg(learner, data_gen, n_train, n_test, it):
         (data_train, labels_train) = data_gen(n_train)
         (data_test, labels_test) = data_gen(n_test)
         acc = eval_classifier(learner, data_train, labels_train, data_test, labels_test)
+        # for last question
+        # acc = eval_classifier(learner, data_train, labels_train, data_train, labels_train)
         avg_acc += acc
     return avg_acc / it
 
@@ -576,8 +578,8 @@ def xval_learning_alg(learner, data, labels, k):
     return sum_score / k
 
 #Test cases:
-test_xval_learning_alg(xval_learning_alg,perceptron)
+# test_xval_learning_alg(xval_learning_alg,perceptron)
 
 
 #For problem 10, here is an example of how to use gen_flipped_lin_separable, in this case with a flip probability of 50%
-#print(eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=.5), 20, 20, 5))
+print(eval_learning_alg(averaged_perceptron, gen_flipped_lin_separable(pflip=.25), 20, 20, 5))

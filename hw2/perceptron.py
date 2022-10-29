@@ -11,7 +11,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from matplotlib import colors
-
 ######################################################################
 # Plotting
 
@@ -553,14 +552,31 @@ def eval_learning_alg(learner, data_gen, n_train, n_test, it):
     return avg_acc / it
 
 #Test cases:
-test_eval_learning_alg(eval_learning_alg,perceptron)
-
+# test_eval_learning_alg(eval_learning_alg,perceptron)
 
 def xval_learning_alg(learner, data, labels, k):
-    pass
+    split_array = np.hsplit(data, data.shape[1])
+    distributed_data = np.array_split(split_array, k)
+    prev = 0
+    scores = []
+    for iteration in range(k):
+        copy_dis_data = distributed_data
+        data_i = np.array(copy_dis_data[iteration]).T[0]
+        copy_dis_data_1 = copy_dis_data[:iteration] + copy_dis_data[iteration + 1:]
+        data_j = np.concatenate(copy_dis_data_1, axis=0).T[0]
+        labels_i = labels[:, prev:prev + data_i.shape[1]]
+        selector = [x for x in range(labels.shape[1]) if x < prev or x >= prev + data_i.shape[1]]
+        labels_j = labels[:, selector]
+        prev += data_i.shape[1]
+        (theta, theta_0) = learner(data_j, labels_j)
+        scores.append(score(data_i, labels_i, theta, theta_0) / labels_i.shape[1])
+    sum_score = 0
+    for element in scores:
+        sum_score += element
+    return sum_score / k
 
 #Test cases:
-#test_xval_learning_alg(xval_learning_alg,perceptron)
+test_xval_learning_alg(xval_learning_alg,perceptron)
 
 
 #For problem 10, here is an example of how to use gen_flipped_lin_separable, in this case with a flip probability of 50%

@@ -1,8 +1,8 @@
 # Implement perceptron, average perceptron, and pegasos
+from math import inf
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
-import pdb
 import itertools
 import operator
 import functools
@@ -254,6 +254,7 @@ def test_with_features(dataFun, order = 2, draw=True, pause=True):
 # T is a positive integer number of steps to run
 def perceptron(data, labels, params = {}, hook = None):
     T = params.get('T', 100)
+    print(data)
     (d, n) = data.shape
     m = 0
     theta = np.zeros((d, 1)); theta_0 = np.zeros((1, 1))
@@ -293,6 +294,69 @@ print("Tests for part 2: test_linear_classifier_with_features, mul, make_polynom
 print("                  test_with_features")
 print("Also loaded: perceptron, one_hot_internal, test_one_hot")
 
+def perceptron_through_origin(data, labels, T = 10000):
+    # print(data)
+    (d, n) = data.shape
+    theta = np.zeros((d, 1))
+    mistakes = 0
+    for test in range(T):
+        for index in range(n):
+            x_i = data[:, index:index + 1]
+            y_i = labels[index]
+            if y_i * (np.dot(theta.T, x_i)) <= 0:
+                mistakes += 1
+                theta = theta + (y_i * x_i)
+    return theta, mistakes
+
+def scaling():
+    data = np.array([[200, 800, 200, 800], [0.2, 0.2, 0.8, 0.8], [1, 1, 1, 1]])
+    labels = cv(value_list=[-1, -1, 1, 1])
+    theta = cv([0, 1, -0.5])
+    margin = inf
+    radius = 0
+    for index in range(data.shape[1]):
+        x_i = data[:, index]
+        y_i = labels[index]
+        margin = min(margin, y_i * (np.dot(theta.T, x_i) / np.linalg.norm(theta)))
+        radius = max(radius, np.linalg.norm(x_i))
+    return radius ** 2 / margin ** 2
+
+def margin():
+    data = np.array([[0.2, 0.8, 0.2, 0.8], [0.2, 0.2, 0.8, 0.8], [1, 1, 1, 1]])
+    labels = cv(value_list=[-1, -1, 1, 1])
+    theta = cv([0, 1, -0.5])
+    margin = inf
+    radius = 0
+    for index in range(data.shape[1]):
+        x_i = data[:, index]
+        y_i = labels[index]
+        margin = abs(min(margin, y_i * (np.dot(theta.T, x_i) / np.linalg.norm(theta))))
+        radius = max(radius, np.linalg.norm(x_i))
+    return radius ** 2 / margin ** 2
+
+# print(margin())
+
+data = np.array([one_hot_internal(1, 6), one_hot_internal(2, 6), one_hot_internal(3, 6), one_hot_internal(4, 6), one_hot_internal(5, 6), one_hot_internal(6, 6)]).T.reshape((6, 6))
+# print(data)
+# print(data.shape)
+
+# print(cv([-1, -1, 1, 1].shape))
+# theta, theta_0 = perceptron(data = data, labels = cv(value_list=[1, -1, -1, -1, -1, 1]), params={'T': 1000})
+
+# print(f"theta = {theta}")
+# print(f"theta0 = {theta_0}")
+# print(f"Samsung: {positive(np.array([[1, 0, 0, 0, 0, 0]]).reshape((6, 1)), theta, theta_0)}")
+# print(f"Nokia: {positive(np.array([[0, 0, 0, 0, 0, 1]]).reshape((6, 1)), theta, theta_0)}")
+
+# degrees = [1, 10, 20, 30, 40, 50]
+# degrees = [3]
+# vec = cv([1, 2])
+# amount = []
+# for order in degrees:
+    # shape = make_polynomial_feature_fun(order)(vec).shape
+    # amount.append(shape[0] * shape[1])
+    
+# print(amount)
 ######################################################################
 #   Example for part 3B) test_with_features()
-#test_with_features(super_simple_separable, 2, draw=True, pause=True)
+test_with_features(super_simple_separable, 2, draw=True, pause=False)

@@ -359,4 +359,7 @@ data = np.array([one_hot_internal(1, 6), one_hot_internal(2, 6), one_hot_interna
 # print(amount)
 ######################################################################
 #   Example for part 3B) test_with_features()
-test_with_features(super_simple_separable, 2, draw=True, pause=False)
+# test_with_features(super_simple_separable_through_origin, 1, draw=True, pause=False)
+# test_with_features(super_simple_separable, 1, draw=True, pause=False)
+# test_with_features(xor, 2, draw=True, pause=False)
+test_with_features(xor_more, 2, draw=True, pause=False)

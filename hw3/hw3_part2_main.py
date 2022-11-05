@@ -18,12 +18,25 @@ features = [('cylinders', hw3.raw),
             ('weight', hw3.raw),
             ('acceleration', hw3.raw),
             ## Drop model_year by default
-            ## ('model_year', hw3.raw),
+            # ('model_year', hw3.raw),
             ('origin', hw3.raw)]
+
+features = [('cylinders', hw3.one_hot),
+            ('displacement', hw3.standard),
+            ('horsepower', hw3.standard),
+            ('weight', hw3.standard),
+            ('acceleration', hw3.standard),
+            ## Drop model_year by default
+            # ('model_year', hw3.raw),
+            ('origin', hw3.one_hot)]
 
 # Construct the standard data and label arrays
 auto_data, auto_labels = hw3.auto_data_and_labels(auto_data_all, features)
-print('auto data and labels shape', auto_data.shape, auto_labels.shape)
+
+# theta, theta_0 = hw3.averaged_perceptron(auto_data, auto_labels, params={'T': 10})
+# print('auto data and labels shape', auto_data.shape, auto_labels.shape)
+
+# print(f"Theta: {theta.T}, theta_0: {theta_0}")
 
 if False:                               # set to True to see histograms
     import matplotlib.pyplot as plt
@@ -38,6 +51,10 @@ if False:                               # set to True to see histograms
         a1.hist(auto_data[feat,auto_labels[0,:] > 0])
         a2.hist(auto_data[feat,auto_labels[0,:] < 0])
         plt.show()
+
+# acc = hw3.xval_learning_alg(hw3.perceptron, auto_data, auto_labels, 10)
+# acc2 = hw3.xval_learning_alg(hw3.averaged_perceptron, auto_data, auto_labels, 10)
+# print(acc, acc2)
 
 #-------------------------------------------------------------------------------
 # Analyze auto data
@@ -63,6 +80,26 @@ dictionary = hw3.bag_of_words(review_texts)
 review_bow_data = hw3.extract_bow_feature_vectors(review_texts, dictionary)
 review_labels = hw3.rv(review_label_list)
 print('review_bow_data and labels shape', review_bow_data.shape, review_labels.shape)
+# for t in [1, 10, 50]:
+#     acc = hw3.xval_learning_alg(hw3.perceptron, review_bow_data, review_labels, 10, t=t)
+#     acc2 = hw3.xval_learning_alg(hw3.averaged_perceptron, review_bow_data, review_labels, 10, t=t)
+#     print(f"t: {t}, acc, acc2: {(acc, acc2)}")
+
+theta, theta0 = hw3.averaged_perceptron(review_bow_data, review_labels, {'T': 10})
+
+res = dict(zip(dictionary.keys(), theta))
+
+top = sorted(res.items(), key=lambda x: x[1], reverse=True)
+bottom = sorted(res.items(), key=lambda x: x[1])
+
+top10 = top[:10]
+bottom10 = bottom[:10]
+
+top10words = [x[0] for x in top10]
+bottom10words = [x[0] for x in bottom10]
+print(top10words)
+print(bottom10words)
+
 
 #-------------------------------------------------------------------------------
 # Analyze review data
@@ -150,4 +187,3 @@ acc = hw3.get_classification_accuracy(raw_mnist_features(data), labels)
 #-------------------------------------------------------------------------------
 
 # Your code here to process the MNIST data
-

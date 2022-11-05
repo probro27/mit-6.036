@@ -187,11 +187,11 @@ def positive(x, th, th0):
 def score(data, labels, th, th0):
     return np.sum(positive(data, th, th0) == labels)
 
-def eval_classifier(learner, data_train, labels_train, data_test, labels_test):
-    th, th0 = learner(data_train, labels_train)
+def eval_classifier(learner, data_train, labels_train, data_test, labels_test, t = 0):
+    th, th0 = learner(data_train, labels_train, params={'T': t})
     return score(data_test, labels_test, th, th0)/data_test.shape[1]
 
-def xval_learning_alg(learner, data, labels, k):
+def xval_learning_alg(learner, data, labels, k, t = 0):
     _, n = data.shape
     idx = list(range(n))
     np.random.seed(0)
@@ -208,7 +208,7 @@ def xval_learning_alg(learner, data, labels, k):
         data_test = np.array(s_data[i])
         labels_test = np.array(s_labels[i])
         score_sum += eval_classifier(learner, data_train, labels_train,
-                                              data_test, labels_test)
+                                              data_test, labels_test, t)
     return score_sum/k
 
 ######################################################################
@@ -435,3 +435,5 @@ print("Tests: test_linear_classifier")
 print("Dataset tools: load_auto_data, std_vals, standard, raw, one_hot, auto_data_and_labels")
 print("               load_review_data, clean, extract_words, bag_of_words, extract_bow_feature_vectors")
 print("               load_mnist_data, load_mnist_single")
+
+features = [("cylinders", raw), ("displacement", raw), ("horsepower", raw)]

@@ -1,7 +1,7 @@
 import pdb
 import numpy as np
 import code_for_hw3_part2 as hw3
-
+import math
 #-------------------------------------------------------------------------------
 # Auto Data
 #-------------------------------------------------------------------------------
@@ -85,20 +85,20 @@ print('review_bow_data and labels shape', review_bow_data.shape, review_labels.s
 #     acc2 = hw3.xval_learning_alg(hw3.averaged_perceptron, review_bow_data, review_labels, 10, t=t)
 #     print(f"t: {t}, acc, acc2: {(acc, acc2)}")
 
-theta, theta0 = hw3.averaged_perceptron(review_bow_data, review_labels, {'T': 10})
+# theta, theta0 = hw3.averaged_perceptron(review_bow_data, review_labels, {'T': 10})
 
-res = dict(zip(dictionary.keys(), theta))
+# res = dict(zip(dictionary.keys(), theta))
 
-top = sorted(res.items(), key=lambda x: x[1], reverse=True)
-bottom = sorted(res.items(), key=lambda x: x[1])
+# top = sorted(res.items(), key=lambda x: x[1], reverse=True)
+# bottom = sorted(res.items(), key=lambda x: x[1])
 
-top10 = top[:10]
-bottom10 = bottom[:10]
+# top10 = top[:10]
+# bottom10 = bottom[:10]
 
-top10words = [x[0] for x in top10]
-bottom10words = [x[0] for x in bottom10]
-print(top10words)
-print(bottom10words)
+# top10words = [x[0] for x in top10]
+# bottom10words = [x[0] for x in bottom10]
+# print(top10words)
+# print(bottom10words)
 
 
 #-------------------------------------------------------------------------------
@@ -129,16 +129,6 @@ mnist_data_all = hw3.load_mnist_data(range(10))
 
 print('mnist_data_all loaded. shape of single images is', mnist_data_all[0]["images"][0].shape)
 
-# HINT: change the [0] and [1] if you want to access different images
-d0 = mnist_data_all[0]["images"]
-d1 = mnist_data_all[1]["images"]
-y0 = np.repeat(-1, len(d0)).reshape(1,-1)
-y1 = np.repeat(1, len(d1)).reshape(1,-1)
-
-# data goes into the feature computation functions
-data = np.vstack((d0, d1))
-# labels can directly go into the perceptron algorithm
-labels = np.vstack((y0.T, y1.T)).T
 
 def raw_mnist_features(x):
     """
@@ -154,7 +144,13 @@ def row_average_features(x):
     @param x (n_samples,m,n) array with values in (0,1)
     @return (m,n_samples) array where each entry is the average of a row
     """
-    raise Exception("modify me!")
+    m, n = x.shape
+    y = np.zeros((m, 1))
+    for i in range(m):
+        sum_i = np.sum(x[i], axis=None)
+        avg_i = sum_i / n
+        y[i,  0] = avg_i
+    return y
 
 
 def col_average_features(x):
@@ -164,7 +160,13 @@ def col_average_features(x):
     @param x (n_samples,m,n) array with values in (0,1)
     @return (n,n_samples) array where each entry is the average of a column
     """
-    raise Exception("modify me!")
+    m, n = x.shape
+    y = np.zeros((n, 1))
+    for i in range(n):
+        sum_i = np.sum(x[:, i], axis=None)
+        avg_i = sum_i / m
+        y[i, 0] = avg_i
+    return y
 
 
 def top_bottom_features(x):
@@ -177,13 +179,54 @@ def top_bottom_features(x):
     and the second entry is the average of the bottom half of the image
     = rows floor(m/2) [inclusive] to m
     """
-    raise Exception("modify me!")
+    row_avg = row_average_features(x)
+    top_limit = math.floor(x.shape[0] / 2)
+    top = row_avg[:top_limit]
+    bottom = row_avg[top_limit:]
+    top_avg = np.sum(top, axis=None) / top_limit
+    bottom_avg = np.sum(bottom, axis=None) / (x.shape[0] - top_limit)
+    z = np.array([[top_avg], [bottom_avg]])
+    return z
 
 # use this function to evaluate accuracy
-acc = hw3.get_classification_accuracy(raw_mnist_features(data), labels)
+# acc = hw3.get_classification_accuracy(raw_mnist_features(data), labels)
 
 #-------------------------------------------------------------------------------
 # Analyze MNIST data
 #-------------------------------------------------------------------------------
 
 # Your code here to process the MNIST data
+
+
+# HINT: change the [0] and [1] if you want to access different images
+for num1, num2 in [(0, 1)]:
+    d0 = mnist_data_all[num1]["images"]
+    d1 = mnist_data_all[num2]["images"]
+    y0 = np.repeat(-1, len(d0)).reshape(1,-1)
+    y1 = np.repeat(1, len(d1)).reshape(1,-1)
+
+    # data goes into the feature computation functions
+    data = np.vstack((d0, d1))
+    print(data.shape)
+    # labels can directly go into the perceptron algorithm
+    labels = np.vstack((y0.T, y1.T)).T
+    
+    n = data.shape[0]
+    refined_data_row = np.zeros((n, 28))
+    refined_data_col = np.zeros((n, 28))
+    for i in range(n):
+        row = data[i]
+        print(row.shape)
+        row_avg = row_average_features(row)
+        print(row_avg.shape)
+        refined_data_row[i] = row_avg.reshape((28, ))
+        print(refined_data_row)
+        break
+        col_avg = col_average_features(row)
+        # print(row_avg)
+        refined_data_row[i] = row_avg[:, 0] 
+        refined_data_col[i] = col_avg[:, 0]
+        
+    # refined_data_T = refined_data.T
+    print(f"Accuracy row {num1} vs {num2}: {hw3.xval_learning_alg(hw3.perceptron, refined_data_row, labels, 10, 50)}")
+    print(f"Accuracy column {num1} vs {num2}: {hw3.xval_learning_alg(hw3.perceptron, refined_data_col, labels, 10, 50)}")
